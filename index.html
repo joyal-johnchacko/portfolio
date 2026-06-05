@@ -130,6 +130,53 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:1.
   opacity:0;
   transition:opacity 0.3s,top 0.4s cubic-bezier(0.4,0,0.2,1);
 }
+/* ── MOBILE RESPONSIVENESS PATCH (WITH SCROLL GUY) ── */
+@media (max-width: 900px) {
+  /* Prevent side-by-side squeezing */
+  .about-grid, .contact-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2.5rem !important;
+  }
+  
+  /* Fix text running off the screen */
+  h1.hn {
+    font-size: clamp(2.5rem, 8vw, 7.5rem) !important;
+  }
+  
+  /* Prevent horizontal scrolling/shrinking */
+  section {
+    padding: 6rem 1.5rem 3.5rem !important;
+  }
+  
+  nav {
+    padding: 0.9rem 1.5rem !important;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Make buttons stack nicely on phones */
+  .hbtns {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+  .bp, .bo {
+    width: 100% !important;
+    text-align: center !important;
+  }
+  
+  /* OPTIMIZE SCROLL GUY FOR PHONE SCREENS */
+  #scroll-guy {
+    right: 6px !important; /* Move closer to edge so he doesn't block text */
+    width: 28px !important; /* Slightly scale down to fit small screens */
+    opacity: 0.7 !important; /* Blend with background so text stays legible */
+    pointer-events: none !important; /* Ensures he doesn't block screen taps */
+  }
+  
+  .guy-label {
+    right: 38px !important;
+    font-size: 0.45rem !important;
+  }
+}
 </style>
 </head>
 <body>
