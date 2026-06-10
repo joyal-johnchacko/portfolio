@@ -10,9 +10,20 @@
 :root{--neon:#00f5c4;--neon2:#7b5cf5;--neon3:#f5005a;--bg:#050811;--card:#0d1120;--border:rgba(0,245,196,0.12);--text:#e8eaf0;--muted:#6b7280}
 html{scroll-behavior:smooth}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;cursor:none}
+
+/* High-Performance Advanced 3D WebGL Background Container */
+#webgl-bg-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
 #cur{width:10px;height:10px;border-radius:50%;background:var(--neon);position:fixed;top:0;left:0;pointer-events:none;z-index:9999;mix-blend-mode:screen}
 #cur2{width:32px;height:32px;border-radius:50%;border:1px solid rgba(0,245,196,0.35);position:fixed;top:0;left:0;pointer-events:none;z-index:9998}
-canvas#c{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.35}
 nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:0.9rem 3rem;background:rgba(5,8,17,0.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
 .logo{font-family:'Space Mono',monospace;font-size:0.9rem;color:var(--neon);letter-spacing:2px}
 nav ul{display:flex;gap:1.8rem;list-style:none}
@@ -102,7 +113,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:1.
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 .cb{animation:blink 1s step-end infinite;color:var(--neon)}
 
-/* SCROLL CHARACTER */
 #scroll-guy{
   position:fixed;
   right:18px;
@@ -130,31 +140,24 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:1.
   opacity:0;
   transition:opacity 0.3s,top 0.4s cubic-bezier(0.4,0,0.2,1);
 }
-/* ── MOBILE RESPONSIVENESS PATCH (WITH SCROLL GUY) ── */
+
 @media (max-width: 900px) {
-  /* Prevent side-by-side squeezing */
   .about-grid, .contact-grid {
     grid-template-columns: 1fr !important;
     gap: 2.5rem !important;
   }
-  
-  /* Fix text running off the screen */
   h1.hn {
     font-size: clamp(2.5rem, 8vw, 7.5rem) !important;
   }
-  
-  /* Prevent horizontal scrolling/shrinking */
   section {
     padding: 6rem 1.5rem 3.5rem !important;
   }
-  
   nav {
     padding: 0.9rem 1.5rem !important;
   }
 }
 
 @media (max-width: 600px) {
-  /* Make buttons stack nicely on phones */
   .hbtns {
     flex-direction: column !important;
     width: 100% !important;
@@ -163,15 +166,11 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:1.
     width: 100% !important;
     text-align: center !important;
   }
-  
-  /* OPTIMIZE SCROLL GUY FOR PHONE SCREENS */
   #scroll-guy {
-    right: 6px !important; /* Move closer to edge so he doesn't block text */
-    width: 28px !important; /* Slightly scale down to fit small screens */
-    opacity: 0.7 !important; /* Blend with background so text stays legible */
-    pointer-events: none !important; /* Ensures he doesn't block screen taps */
+    right: 6px !important;
+    width: 28px !important;
+    opacity: 0.7 !important;
   }
-  
   .guy-label {
     right: 38px !important;
     font-size: 0.45rem !important;
@@ -182,9 +181,10 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:1.
 <body>
 <div id="cur"></div>
 <div id="cur2"></div>
-<canvas id="c"></canvas>
 
-<!-- SCROLL CHARACTER -->
+<!-- Master 3D Space Scene Canvas Layer -->
+<div id="webgl-bg-container"></div>
+
 <canvas id="scroll-guy" width="36" height="52"></canvas>
 <div class="guy-label" id="guy-label">// looking around</div>
 
@@ -389,8 +389,11 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:1.
   <div class="ft">© 2026 Joyal John Chacko · MEC Kochi</div>
 </footer>
 
+<!-- Include Three.js via official CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
 <script>
-// ── CURSOR ──
+// ── MOUSE INTERACTION TRACKING ──
 const cur=document.getElementById('cur'),cur2=document.getElementById('cur2');
 let mx=0,my=0,rx=0,ry=0;
 document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.transform=`translate(${mx-5}px,${my-5}px)`;});
@@ -400,34 +403,219 @@ document.querySelectorAll('a,button,.pc,.sk,.cc').forEach(el=>{
   el.addEventListener('mouseleave',()=>{cur.style.transform=cur.style.transform.replace(' scale(2.5)','');cur2.style.borderColor='rgba(0,245,196,0.35)';});
 });
 
-// ── BG PARTICLES ──
-const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
-function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
-resize();window.addEventListener('resize',resize);
-const pts=Array.from({length:70},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,r:Math.random()*1.2+.4,a:Math.random()*.4+.15}));
-(function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  pts.forEach((p,i)=>{
-    p.x+=p.vx;p.y+=p.vy;
-    if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;
-    if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;
-    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(0,245,196,${p.a})`;ctx.fill();
-    for(let j=i+1;j<pts.length;j++){
-      const dx=p.x-pts[j].x,dy=p.y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
-      if(d<110){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(0,245,196,${.06*(1-d/110)})`;ctx.lineWidth=.4;ctx.stroke();}
+// ── THREE.JS MASTER ENGINE ──
+const container = document.getElementById('webgl-bg-container');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+container.appendChild(renderer.domElement);
+
+// --- 1. QUANTUM PLANES (TOP & BOTTOM MATRICES) ---
+const gridGeometry = new THREE.BufferGeometry();
+const gridCountX = 45;
+const gridCountZ = 45;
+const totalNodes = gridCountX * gridCountZ * 2;
+const gridPositions = new Float32Array(totalNodes * 3);
+
+let nodeIdx = 0;
+for(let x = 0; x < gridCountX; x++) {
+  for(let z = 0; z < gridCountZ; z++) {
+    gridPositions[nodeIdx] = (x - gridCountX / 2) * 1.6;
+    gridPositions[nodeIdx+1] = -8;
+    gridPositions[nodeIdx+2] = (z - gridCountZ / 2) * 1.6;
+    nodeIdx += 3;
+  }
+}
+for(let x = 0; x < gridCountX; x++) {
+  for(let z = 0; z < gridCountZ; z++) {
+    gridPositions[nodeIdx] = (x - gridCountX / 2) * 1.6;
+    gridPositions[nodeIdx+1] = 8;
+    gridPositions[nodeIdx+2] = (z - gridCountZ / 2) * 1.6;
+    nodeIdx += 3;
+  }
+}
+
+gridGeometry.setAttribute('position', new THREE.BufferAttribute(gridPositions, 3));
+const gridMaterial = new THREE.PointsMaterial({
+  color: 0x00f5c4,
+  size: 0.09,
+  transparent: true,
+  opacity: 0.45
+});
+const matrixNodes = new THREE.Points(gridGeometry, gridMaterial);
+scene.add(matrixNodes);
+
+// --- 2. REDUCED VIOLET HYPERSPACE STREAMS ---
+const streamCount = 60; // Reduced count significantly for a cleaner look
+const streamGeometry = new THREE.BufferGeometry();
+const streamPositions = new Float32Array(streamCount * 3);
+const streamVelocities = [];
+
+for(let i=0; i<streamCount*3; i+=3) {
+  streamPositions[i] = (Math.random() - 0.5) * 45;
+  streamPositions[i+1] = (Math.random() - 0.5) * 25;
+  streamPositions[i+2] = (Math.random() - 0.5) * 50;
+  streamVelocities.push(0, 0, Math.random() * 0.1 + 0.05);
+}
+streamGeometry.setAttribute('position', new THREE.BufferAttribute(streamPositions, 3));
+const streamMaterial = new THREE.PointsMaterial({
+  color: 0x7b5cf5,
+  size: 0.14,
+  transparent: true,
+  opacity: 0.55
+});
+const spaceStreams = new THREE.Points(streamGeometry, streamMaterial);
+scene.add(spaceStreams);
+
+// --- 3. NEW FEATURE: AUTONOMOUS ROAMING AI NODES ---
+const roamingCount = 25;
+const roamingGroup = new THREE.Group();
+const roamingObjects = [];
+
+const nodeGeom = new THREE.DodecahedronGeometry(0.2, 0);
+const nodeMat = new THREE.MeshBasicMaterial({
+  color: 0x00f5c4,
+  wireframe: true,
+  transparent: true,
+  opacity: 0.4
+});
+
+for(let i=0; i<roamingCount; i++) {
+  const mesh = new THREE.Mesh(nodeGeom, nodeMat);
+  
+  // Set random starting positions distributed in 3D coordinate spaces
+  mesh.position.set(
+    (Math.random() - 0.5) * 35,
+    (Math.random() - 0.5) * 15,
+    (Math.random() - 0.5) * 30
+  );
+  
+  // Custom velocity properties for wandering behavior
+  mesh.userData = {
+    vx: (Math.random() - 0.5) * 0.03,
+    vy: (Math.random() - 0.5) * 0.02,
+    vz: (Math.random() - 0.5) * 0.03,
+    rotX: Math.random() * 0.02,
+    rotY: Math.random() * 0.02,
+    seed: Math.random() * 100 // offsets mathematical noise pathways
+  };
+  
+  roamingGroup.add(mesh);
+  roamingObjects.push(mesh);
+}
+scene.add(roamingGroup);
+
+camera.position.z = 15;
+
+// Structural layout validation rules on view adjustments
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+});
+
+let targetMouseX = 0, targetMouseY = 0;
+let currentMouseX = 0, currentMouseY = 0;
+let scrollOffsetVelocity = 0;
+let globalTimeCounter = 0;
+
+document.addEventListener('mousemove', (e) => {
+  targetMouseX = (e.clientX / window.innerWidth - 0.5) * 4;
+  targetMouseY = (e.clientY / window.innerHeight - 0.5) * 4;
+});
+
+window.addEventListener('scroll', () => {
+  scrollOffsetVelocity = Math.min(scrollOffsetVelocity + 0.25, 5.0);
+}, { passive: true });
+
+// Core rendering computation loop
+function animateQuantumSpace() {
+  requestAnimationFrame(animateQuantumSpace);
+  globalTimeCounter += 0.02;
+  
+  scrollOffsetVelocity *= 0.92; // smooth kinematics decay
+  
+  currentMouseX += (targetMouseX - currentMouseX) * 0.05;
+  currentMouseY += (targetMouseY - currentMouseY) * 0.05;
+
+  // --- MATRIX PLANES PHYSICS ---
+  const nodePositions = matrixNodes.geometry.attributes.position.array;
+  for(let i = 0; i < totalNodes; i++) {
+    const idx = i * 3;
+    const xCoord = nodePositions[idx];
+    const zCoord = nodePositions[idx+2];
+    
+    const wave1 = Math.sin(xCoord * 0.15 + globalTimeCounter) * 1.2;
+    const wave2 = Math.cos(zCoord * 0.2 + globalTimeCounter * 0.8) * 0.8;
+    
+    const distToMouse = Math.sqrt(Math.pow(xCoord - currentMouseX*3, 2) + Math.pow(zCoord, 2));
+    const mouseWarpFactor = Math.max(0, (15 - distToMouse) * 0.18);
+    
+    if(i < totalNodes / 2) {
+      nodePositions[idx+1] = -6 + (wave1 + wave2) - mouseWarpFactor;
+    } else {
+      nodePositions[idx+1] = 6 + (wave1 + wave2) + mouseWarpFactor;
+    }
+  }
+  matrixNodes.geometry.attributes.position.needsUpdate = true;
+
+  // --- CHRONO STREAM PHYSICS ---
+  const streamCoords = spaceStreams.geometry.attributes.position.array;
+  for(let i=0; i<streamCount; i++) {
+    const idx = i * 3;
+    streamCoords[idx+2] += streamVelocities[i] * (1 + scrollOffsetVelocity * 15);
+    
+    if(streamCoords[idx+2] > 25) {
+      streamCoords[idx] = (Math.random() - 0.5) * 45;
+      streamCoords[idx+1] = (Math.random() - 0.5) * 25;
+      streamCoords[idx+2] = -25;
+    }
+  }
+  spaceStreams.geometry.attributes.position.needsUpdate = true;
+
+  // --- ROAMING AI NODES PHYSICS ---
+  roamingObjects.forEach(obj => {
+    const data = obj.userData;
+    
+    // Smooth wandering calculations incorporating sine functions and custom noise vectors
+    obj.position.x += data.vx + Math.sin(globalTimeCounter + data.seed) * 0.008;
+    obj.position.y += data.vy + Math.cos(globalTimeCounter + data.seed) * 0.005;
+    obj.position.z += data.vz + (scrollOffsetVelocity * 0.15); // accelerates forward when scrolling
+    
+    // Spin independent entities
+    obj.rotation.x += data.rotX;
+    obj.rotation.y += data.rotY;
+    
+    // Bounds boundaries constraint check matrices
+    if(Math.abs(obj.position.x) > 22) data.vx *= -1;
+    if(Math.abs(obj.position.y) > 10) data.vy *= -1;
+    if(obj.position.z > 20) {
+      obj.position.z = -25;
+    } else if(obj.position.z < -25) {
+      obj.position.z = 20;
     }
   });
-  requestAnimationFrame(draw);
-})();
+
+  // Coordinate viewpoint shifts relative to actions
+  camera.position.x += (currentMouseX - camera.position.x) * 0.05;
+  camera.position.y += (-currentMouseY - camera.position.y) * 0.05;
+  camera.lookAt(0, 0, 0);
+
+  renderer.render(scene, camera);
+}
+animateQuantumSpace();
 
 // ── TYPING ──
 const phrases=['CSE Student @ MEC Kochi','Full-Stack Developer','ML & AI Enthusiast','Java · Python · Django Dev','Building the future, one commit at a time'];
 let pi=0,ci=0,del=false;
 const tel=document.getElementById('typed');
 (function type(){
-  const cur=phrases[pi];
-  if(!del){tel.textContent=cur.slice(0,++ci);if(ci===cur.length){del=true;setTimeout(type,2200);return;}}
-  else{tel.textContent=cur.slice(0,--ci);if(ci===0){del=false;pi=(pi+1)%phrases.length;}}
+  const curPhrase = phrases[pi];
+  if(!del){tel.textContent=curPhrase.slice(0,++ci);if(ci===curPhrase.length){del=true;setTimeout(type,2200);return;}}
+  else{tel.textContent=curPhrase.slice(0,--ci);if(ci===0){del=false;pi=(pi+1)%phrases.length;}}
   setTimeout(type,del?55:95);
 })();
 
@@ -447,38 +635,27 @@ const guyCanvas = document.getElementById('scroll-guy');
 const gCtx = guyCanvas.getContext('2d');
 const guyLabel = document.getElementById('guy-label');
 
-const N = '#00f5c4'; // neon
+const N = '#00f5c4';
 const N2 = '#7b5cf5';
 const SKIN = '#f5c4a0';
-const DARK = '#050811';
 
 let frame = 0;
 let isWalking = false;
 let isLooking = false;
-let lookDir = 1; // 1=right(into page), -1=left
+let lookDir = 1;
 let scrollTimeout = null;
 let currentSection = '';
 
-const sectionLabels = {
-  'hero':       ' ',
-  'about':      ' ',
-  'skills':     ' ',
-  'projects':   ' ',
-  'experience': ' ',
-  'certs':      ' ',
-  'contact':    ' '
-};
+const sectionLabels = { 'hero':' ','about':' ','skills':' ','projects':' ','experience':' ','certs':' ','contact':' ' };
 
 function drawGuy(walking, looking, dir) {
   gCtx.clearRect(0, 0, 36, 52);
   const t = frame;
-  const walkOffset = walking ? Math.sin(t * 0.4) * 2 : 0;
   const legSwing = walking ? Math.sin(t * 0.4) * 6 : 0;
   const armSwing = walking ? Math.sin(t * 0.4) * 5 : 0;
   const bobY = walking ? Math.abs(Math.sin(t * 0.4)) * 1.5 : 0;
   const cx = 18;
 
-  // SHADOW
   gCtx.save();
   gCtx.globalAlpha = 0.25;
   gCtx.fillStyle = N;
@@ -487,8 +664,6 @@ function drawGuy(walking, looking, dir) {
   gCtx.fill();
   gCtx.restore();
 
-  // LEGS
-  // Left leg
   gCtx.save();
   gCtx.strokeStyle = N2;
   gCtx.lineWidth = 3.5;
@@ -497,12 +672,10 @@ function drawGuy(walking, looking, dir) {
   gCtx.moveTo(cx-3, 35-bobY);
   gCtx.lineTo(cx-3 + (walking ? -legSwing*0.4 : 0), 46-bobY + (walking ? Math.abs(legSwing)*0.2 : 0));
   gCtx.stroke();
-  // Right leg
   gCtx.beginPath();
   gCtx.moveTo(cx+3, 35-bobY);
   gCtx.lineTo(cx+3 + (walking ? legSwing*0.4 : 0), 46-bobY + (walking ? Math.abs(legSwing)*0.2 : 0));
   gCtx.stroke();
-  // Feet
   gCtx.strokeStyle = N;
   gCtx.lineWidth = 2.5;
   gCtx.beginPath();
@@ -515,13 +688,11 @@ function drawGuy(walking, looking, dir) {
   gCtx.stroke();
   gCtx.restore();
 
-  // BODY
   gCtx.save();
   gCtx.fillStyle = N2;
   gCtx.beginPath();
   gCtx.roundRect(cx-6, 22-bobY, 12, 14, 2);
   gCtx.fill();
-  // Shirt detail
   gCtx.strokeStyle = N;
   gCtx.lineWidth = 0.8;
   gCtx.globalAlpha = 0.5;
@@ -531,38 +702,26 @@ function drawGuy(walking, looking, dir) {
   gCtx.stroke();
   gCtx.restore();
 
-  // ARMS
   gCtx.save();
   gCtx.strokeStyle = SKIN;
   gCtx.lineWidth = 3;
   gCtx.lineCap = 'round';
-  // Left arm
   gCtx.beginPath();
   gCtx.moveTo(cx-6, 24-bobY);
-  if(looking) {
-    gCtx.lineTo(cx-6 + dir*8, 26-bobY);
-  } else {
-    gCtx.lineTo(cx-10, 30-bobY+(walking?armSwing*0.3:0));
-  }
+  if(looking) gCtx.lineTo(cx-6 + dir*8, 26-bobY);
+  else gCtx.lineTo(cx-10, 30-bobY+(walking?armSwing*0.3:0));
   gCtx.stroke();
-  // Right arm
   gCtx.beginPath();
   gCtx.moveTo(cx+6, 24-bobY);
-  if(looking) {
-    gCtx.lineTo(cx+6 + dir*2, 26-bobY);
-  } else {
-    gCtx.lineTo(cx+10, 30-bobY+(walking?-armSwing*0.3:0));
-  }
+  if(looking) gCtx.lineTo(cx+6 + dir*2, 26-bobY);
+  else gCtx.lineTo(cx+10, 30-bobY+(walking?-armSwing*0.3:0));
   gCtx.stroke();
   gCtx.restore();
 
-  // NECK
   gCtx.fillStyle = SKIN;
   gCtx.fillRect(cx-2, 17-bobY, 4, 5);
 
-  // HEAD
   gCtx.save();
-  // Head tilt when looking
   const headTilt = looking ? dir * 0.15 : 0;
   gCtx.translate(cx, 13-bobY);
   gCtx.rotate(headTilt);
@@ -570,14 +729,12 @@ function drawGuy(walking, looking, dir) {
   gCtx.beginPath();
   gCtx.ellipse(0, 0, 7, 8, 0, 0, Math.PI*2);
   gCtx.fill();
-  // Hair
   gCtx.fillStyle = '#2a1a0a';
   gCtx.beginPath();
   gCtx.ellipse(0, -5, 7, 4, 0, Math.PI, 0);
   gCtx.fill();
-  // Eyes
+  
   if(looking) {
-    // Looking sideways
     gCtx.fillStyle = '#1a1a2e';
     gCtx.beginPath();
     gCtx.ellipse(dir*2.5, 0, 2.5, 2, 0, 0, Math.PI*2);
@@ -587,7 +744,6 @@ function drawGuy(walking, looking, dir) {
     gCtx.arc(dir*3, 0, 0.8, 0, Math.PI*2);
     gCtx.fill();
   } else {
-    // Forward facing eyes
     gCtx.fillStyle = '#1a1a2e';
     gCtx.beginPath();
     gCtx.ellipse(-2.5, 0, 2, 2, 0, 0, Math.PI*2);
@@ -603,7 +759,6 @@ function drawGuy(walking, looking, dir) {
     gCtx.arc(2.5, 0, 0.8, 0, Math.PI*2);
     gCtx.fill();
   }
-  // Smile
   gCtx.strokeStyle = '#c0603a';
   gCtx.lineWidth = 1;
   gCtx.beginPath();
@@ -611,7 +766,6 @@ function drawGuy(walking, looking, dir) {
   gCtx.stroke();
   gCtx.restore();
 
-  // Neon glow outline
   gCtx.save();
   gCtx.globalAlpha = 0.12;
   gCtx.strokeStyle = N;
@@ -622,7 +776,6 @@ function drawGuy(walking, looking, dir) {
   gCtx.restore();
 }
 
-// Get current section
 function getCurrentSection() {
   const sections = ['contact','certs','experience','projects','skills','about','hero'];
   for(const id of sections) {
@@ -635,7 +788,6 @@ function getCurrentSection() {
   return 'hero';
 }
 
-// Position guy along right edge based on scroll
 function updateGuyPosition() {
   const scrolled = window.scrollY;
   const maxScroll = document.body.scrollHeight - window.innerHeight;
@@ -647,7 +799,6 @@ function updateGuyPosition() {
   guyLabel.style.top = (targetTop + 10) + 'px';
 }
 
-// Animation loop
 let lastScroll = window.scrollY;
 (function animGuy() {
   frame++;
