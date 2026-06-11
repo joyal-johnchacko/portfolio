@@ -147,7 +147,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:1.
     gap: 2.5rem !important;
   }
   h1.hn {
-    font-size: clamp(2.5rem, 8vw, 7.5rem) !important;
+    font-size: clamp(2.5rem,8vw,7.5rem) !important;
   }
   section {
     padding: 6rem 1.5rem 3.5rem !important;
@@ -361,8 +361,11 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:1.
       <div class="cico">TA</div>
       <div>
         <div class="cn">GenAI Powered Data Analytics</div>
-        <div class="ci">Tata Group · Forage Job Simulation</div>
-        <div class="cy">Virtual Experience · 2025</div>
+        <div class="ci">Tata iQ · Forage Job Simulation · 2025</div>
+        <div class="cy">AI strategy, EDA, predictive modeling & ethical AI for financial services</div>
+        <div style="margin-top:0.5rem">
+          <a href="https://www.theforage.com/completion-certificates/ifobHAoMjQs9s6bKS/gMTdCXwDdLYoXZ3wG_ifobHAoMjQs9s6bKS_6a1e6536e8d87e63d037d4d2_1781157405462_completion_certificate.pdf" target="_blank" class="pl" style="font-size:0.58rem">View Certificate →</a>
+        </div>
       </div>
     </div>
   </div>
@@ -403,217 +406,147 @@ document.querySelectorAll('a,button,.pc,.sk,.cc').forEach(el=>{
   el.addEventListener('mouseleave',()=>{cur.style.transform=cur.style.transform.replace(' scale(2.5)','');cur2.style.borderColor='rgba(0,245,196,0.35)';});
 });
 
-// ── THREE.JS MASTER ENGINE ──
-const container = document.getElementById('webgl-bg-container');
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-container.appendChild(renderer.domElement);
+// ── THREE.JS 3D BACKGROUND ──
+(function(){
+  const container = document.getElementById('webgl-bg-container');
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+  camera.position.set(0, 0, 30);
 
-// --- 1. QUANTUM PLANES (TOP & BOTTOM MATRICES) ---
-const gridGeometry = new THREE.BufferGeometry();
-const gridCountX = 45;
-const gridCountZ = 45;
-const totalNodes = gridCountX * gridCountZ * 2;
-const gridPositions = new Float32Array(totalNodes * 3);
-
-let nodeIdx = 0;
-for(let x = 0; x < gridCountX; x++) {
-  for(let z = 0; z < gridCountZ; z++) {
-    gridPositions[nodeIdx] = (x - gridCountX / 2) * 1.6;
-    gridPositions[nodeIdx+1] = -8;
-    gridPositions[nodeIdx+2] = (z - gridCountZ / 2) * 1.6;
-    nodeIdx += 3;
-  }
-}
-for(let x = 0; x < gridCountX; x++) {
-  for(let z = 0; z < gridCountZ; z++) {
-    gridPositions[nodeIdx] = (x - gridCountX / 2) * 1.6;
-    gridPositions[nodeIdx+1] = 8;
-    gridPositions[nodeIdx+2] = (z - gridCountZ / 2) * 1.6;
-    nodeIdx += 3;
-  }
-}
-
-gridGeometry.setAttribute('position', new THREE.BufferAttribute(gridPositions, 3));
-const gridMaterial = new THREE.PointsMaterial({
-  color: 0x00f5c4,
-  size: 0.09,
-  transparent: true,
-  opacity: 0.45
-});
-const matrixNodes = new THREE.Points(gridGeometry, gridMaterial);
-scene.add(matrixNodes);
-
-// --- 2. REDUCED VIOLET HYPERSPACE STREAMS ---
-const streamCount = 60; // Reduced count significantly for a cleaner look
-const streamGeometry = new THREE.BufferGeometry();
-const streamPositions = new Float32Array(streamCount * 3);
-const streamVelocities = [];
-
-for(let i=0; i<streamCount*3; i+=3) {
-  streamPositions[i] = (Math.random() - 0.5) * 45;
-  streamPositions[i+1] = (Math.random() - 0.5) * 25;
-  streamPositions[i+2] = (Math.random() - 0.5) * 50;
-  streamVelocities.push(0, 0, Math.random() * 0.1 + 0.05);
-}
-streamGeometry.setAttribute('position', new THREE.BufferAttribute(streamPositions, 3));
-const streamMaterial = new THREE.PointsMaterial({
-  color: 0x7b5cf5,
-  size: 0.14,
-  transparent: true,
-  opacity: 0.55
-});
-const spaceStreams = new THREE.Points(streamGeometry, streamMaterial);
-scene.add(spaceStreams);
-
-// --- 3. NEW FEATURE: AUTONOMOUS ROAMING AI NODES ---
-const roamingCount = 25;
-const roamingGroup = new THREE.Group();
-const roamingObjects = [];
-
-const nodeGeom = new THREE.DodecahedronGeometry(0.2, 0);
-const nodeMat = new THREE.MeshBasicMaterial({
-  color: 0x00f5c4,
-  wireframe: true,
-  transparent: true,
-  opacity: 0.4
-});
-
-for(let i=0; i<roamingCount; i++) {
-  const mesh = new THREE.Mesh(nodeGeom, nodeMat);
-  
-  // Set random starting positions distributed in 3D coordinate spaces
-  mesh.position.set(
-    (Math.random() - 0.5) * 35,
-    (Math.random() - 0.5) * 15,
-    (Math.random() - 0.5) * 30
-  );
-  
-  // Custom velocity properties for wandering behavior
-  mesh.userData = {
-    vx: (Math.random() - 0.5) * 0.03,
-    vy: (Math.random() - 0.5) * 0.02,
-    vz: (Math.random() - 0.5) * 0.03,
-    rotX: Math.random() * 0.02,
-    rotY: Math.random() * 0.02,
-    seed: Math.random() * 100 // offsets mathematical noise pathways
-  };
-  
-  roamingGroup.add(mesh);
-  roamingObjects.push(mesh);
-}
-scene.add(roamingGroup);
-
-camera.position.z = 15;
-
-// Structural layout validation rules on view adjustments
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
+  const renderer = new THREE.WebGLRenderer({ alpha:true, antialias:true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-});
+  container.appendChild(renderer.domElement);
 
-let targetMouseX = 0, targetMouseY = 0;
-let currentMouseX = 0, currentMouseY = 0;
-let scrollOffsetVelocity = 0;
-let globalTimeCounter = 0;
+  // — Floating particle field —
+  const PCOUNT = 180;
+  const pPos = new Float32Array(PCOUNT * 3);
+  const pVel = [];
+  for(let i=0;i<PCOUNT;i++){
+    pPos[i*3]   = (Math.random()-0.5)*80;
+    pPos[i*3+1] = (Math.random()-0.5)*80;
+    pPos[i*3+2] = (Math.random()-0.5)*40;
+    pVel.push({ x:(Math.random()-0.5)*0.012, y:(Math.random()-0.5)*0.012, z:0 });
+  }
+  const pGeo = new THREE.BufferGeometry();
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos,3));
+  scene.add(new THREE.Points(pGeo, new THREE.PointsMaterial({color:0x00f5c4,size:0.14,transparent:true,opacity:0.5})));
 
-document.addEventListener('mousemove', (e) => {
-  targetMouseX = (e.clientX / window.innerWidth - 0.5) * 4;
-  targetMouseY = (e.clientY / window.innerHeight - 0.5) * 4;
-});
+  // — Icosahedron wireframe (hero centrepiece) —
+  const ico = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(9,1),
+    new THREE.MeshBasicMaterial({color:0x00f5c4,wireframe:true,transparent:true,opacity:0.07})
+  );
+  scene.add(ico);
 
-window.addEventListener('scroll', () => {
-  scrollOffsetVelocity = Math.min(scrollOffsetVelocity + 0.25, 5.0);
-}, { passive: true });
+  // — Torus ring 1 —
+  const ring1 = new THREE.Mesh(
+    new THREE.TorusGeometry(13,0.06,8,90),
+    new THREE.MeshBasicMaterial({color:0x7b5cf5,transparent:true,opacity:0.18})
+  );
+  ring1.rotation.x = Math.PI/2.8;
+  scene.add(ring1);
 
-// Core rendering computation loop
-function animateQuantumSpace() {
-  requestAnimationFrame(animateQuantumSpace);
-  globalTimeCounter += 0.02;
-  
-  scrollOffsetVelocity *= 0.92; // smooth kinematics decay
-  
-  currentMouseX += (targetMouseX - currentMouseX) * 0.05;
-  currentMouseY += (targetMouseY - currentMouseY) * 0.05;
+  // — Torus ring 2 —
+  const ring2 = new THREE.Mesh(
+    new THREE.TorusGeometry(18,0.04,8,120),
+    new THREE.MeshBasicMaterial({color:0x00f5c4,transparent:true,opacity:0.09})
+  );
+  ring2.rotation.x = Math.PI/4;
+  ring2.rotation.y = Math.PI/6;
+  scene.add(ring2);
 
-  // --- MATRIX PLANES PHYSICS ---
-  const nodePositions = matrixNodes.geometry.attributes.position.array;
-  for(let i = 0; i < totalNodes; i++) {
-    const idx = i * 3;
-    const xCoord = nodePositions[idx];
-    const zCoord = nodePositions[idx+2];
-    
-    const wave1 = Math.sin(xCoord * 0.15 + globalTimeCounter) * 1.2;
-    const wave2 = Math.cos(zCoord * 0.2 + globalTimeCounter * 0.8) * 0.8;
-    
-    const distToMouse = Math.sqrt(Math.pow(xCoord - currentMouseX*3, 2) + Math.pow(zCoord, 2));
-    const mouseWarpFactor = Math.max(0, (15 - distToMouse) * 0.18);
-    
-    if(i < totalNodes / 2) {
-      nodePositions[idx+1] = -6 + (wave1 + wave2) - mouseWarpFactor;
-    } else {
-      nodePositions[idx+1] = 6 + (wave1 + wave2) + mouseWarpFactor;
+  // — Small orbiting tetrahedron —
+  const tet = new THREE.Mesh(
+    new THREE.TetrahedronGeometry(1.2,0),
+    new THREE.MeshBasicMaterial({color:0xf5005a,wireframe:true,transparent:true,opacity:0.55})
+  );
+  scene.add(tet);
+
+  // — Second small orbiting octahedron —
+  const oct = new THREE.Mesh(
+    new THREE.OctahedronGeometry(0.9,0),
+    new THREE.MeshBasicMaterial({color:0x7b5cf5,wireframe:true,transparent:true,opacity:0.55})
+  );
+  scene.add(oct);
+
+  // — Connection lines between close particles —
+  const lineVerts=[];
+  for(let i=0;i<PCOUNT;i++){
+    for(let j=i+1;j<PCOUNT;j++){
+      const dx=pPos[i*3]-pPos[j*3], dy=pPos[i*3+1]-pPos[j*3+1], dz=pPos[i*3+2]-pPos[j*3+2];
+      if(Math.sqrt(dx*dx+dy*dy+dz*dz)<10){
+        lineVerts.push(pPos[i*3],pPos[i*3+1],pPos[i*3+2], pPos[j*3],pPos[j*3+1],pPos[j*3+2]);
+      }
     }
   }
-  matrixNodes.geometry.attributes.position.needsUpdate = true;
+  const lineGeo = new THREE.BufferGeometry();
+  lineGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(lineVerts),3));
+  scene.add(new THREE.LineSegments(lineGeo, new THREE.LineBasicMaterial({color:0x00f5c4,transparent:true,opacity:0.06})));
 
-  // --- CHRONO STREAM PHYSICS ---
-  const streamCoords = spaceStreams.geometry.attributes.position.array;
-  for(let i=0; i<streamCount; i++) {
-    const idx = i * 3;
-    streamCoords[idx+2] += streamVelocities[i] * (1 + scrollOffsetVelocity * 15);
-    
-    if(streamCoords[idx+2] > 25) {
-      streamCoords[idx] = (Math.random() - 0.5) * 45;
-      streamCoords[idx+1] = (Math.random() - 0.5) * 25;
-      streamCoords[idx+2] = -25;
-    }
-  }
-  spaceStreams.geometry.attributes.position.needsUpdate = true;
-
-  // --- ROAMING AI NODES PHYSICS ---
-  roamingObjects.forEach(obj => {
-    const data = obj.userData;
-    
-    // Smooth wandering calculations incorporating sine functions and custom noise vectors
-    obj.position.x += data.vx + Math.sin(globalTimeCounter + data.seed) * 0.008;
-    obj.position.y += data.vy + Math.cos(globalTimeCounter + data.seed) * 0.005;
-    obj.position.z += data.vz + (scrollOffsetVelocity * 0.15); // accelerates forward when scrolling
-    
-    // Spin independent entities
-    obj.rotation.x += data.rotX;
-    obj.rotation.y += data.rotY;
-    
-    // Bounds boundaries constraint check matrices
-    if(Math.abs(obj.position.x) > 22) data.vx *= -1;
-    if(Math.abs(obj.position.y) > 10) data.vy *= -1;
-    if(obj.position.z > 20) {
-      obj.position.z = -25;
-    } else if(obj.position.z < -25) {
-      obj.position.z = 20;
-    }
+  let tMouseX=0, tMouseY=0, cMouseX=0, cMouseY=0;
+  let scrollY=0, tScrollY=0;
+  document.addEventListener('mousemove',e=>{
+    tMouseX=(e.clientX/window.innerWidth-0.5)*4;
+    tMouseY=(e.clientY/window.innerHeight-0.5)*3;
+  });
+  window.addEventListener('scroll',()=>{ tScrollY=window.scrollY*0.004; },{passive:true});
+  window.addEventListener('resize',()=>{
+    camera.aspect=window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth,window.innerHeight);
   });
 
-  // Coordinate viewpoint shifts relative to actions
-  camera.position.x += (currentMouseX - camera.position.x) * 0.05;
-  camera.position.y += (-currentMouseY - camera.position.y) * 0.05;
-  camera.lookAt(0, 0, 0);
+  let t=0;
+  function animateBG(){
+    requestAnimationFrame(animateBG);
+    t+=0.008;
 
-  renderer.render(scene, camera);
-}
-animateQuantumSpace();
+    scrollY+=(tScrollY-scrollY)*0.07;
+    cMouseX+=(tMouseX-cMouseX)*0.04;
+    cMouseY+=(tMouseY-cMouseY)*0.04;
+
+    // Rotate central shapes
+    ico.rotation.x=t*0.15;
+    ico.rotation.y=t*0.11;
+    ring1.rotation.z=t*0.07;
+    ring2.rotation.z=-t*0.05;
+    ring2.rotation.x=Math.PI/4+t*0.03;
+
+    // Orbit tetrahedron
+    const r1=14;
+    tet.position.set(Math.cos(t*0.6)*r1, Math.sin(t*0.4)*5, Math.sin(t*0.6)*r1*0.5);
+    tet.rotation.x=t*1.1; tet.rotation.y=t*0.8;
+
+    // Orbit octahedron (opposite)
+    const r2=10;
+    oct.position.set(Math.cos(t*0.5+Math.PI)*r2, Math.sin(t*0.35+1)*4, Math.sin(t*0.5+Math.PI)*r2*0.5);
+    oct.rotation.x=-t*0.9; oct.rotation.z=t*1.2;
+
+    // Drift particles
+    const pa=pGeo.attributes.position.array;
+    for(let i=0;i<PCOUNT;i++){
+      pa[i*3]+=pVel[i].x; pa[i*3+1]+=pVel[i].y;
+      if(pa[i*3]>40||pa[i*3]<-40) pVel[i].x*=-1;
+      if(pa[i*3+1]>40||pa[i*3+1]<-40) pVel[i].y*=-1;
+    }
+    pGeo.attributes.position.needsUpdate=true;
+
+    camera.position.x+=(cMouseX-camera.position.x)*0.04;
+    camera.position.y+=(-cMouseY+scrollY*2-camera.position.y)*0.04;
+    camera.lookAt(0, scrollY*2, 0);
+
+    renderer.render(scene,camera);
+  }
+  animateBG();
+})();
 
 // ── TYPING ──
 const phrases=['CSE Student @ MEC Kochi','Full-Stack Developer','ML & AI Enthusiast','Java · Python · Django Dev','Building the future, one commit at a time'];
 let pi=0,ci=0,del=false;
 const tel=document.getElementById('typed');
 (function type(){
-  const curPhrase = phrases[pi];
+  const curPhrase=phrases[pi];
   if(!del){tel.textContent=curPhrase.slice(0,++ci);if(ci===curPhrase.length){del=true;setTimeout(type,2200);return;}}
   else{tel.textContent=curPhrase.slice(0,--ci);if(ci===0){del=false;pi=(pi+1)%phrases.length;}}
   setTimeout(type,del?55:95);
@@ -631,202 +564,121 @@ const obs=new IntersectionObserver(entries=>{
 document.querySelectorAll('.reveal,.ei').forEach(el=>obs.observe(el));
 
 // ── SCROLL CHARACTER ──
-const guyCanvas = document.getElementById('scroll-guy');
-const gCtx = guyCanvas.getContext('2d');
-const guyLabel = document.getElementById('guy-label');
+const guyCanvas=document.getElementById('scroll-guy');
+const gCtx=guyCanvas.getContext('2d');
+const guyLabel=document.getElementById('guy-label');
+const N='#00f5c4',N2='#7b5cf5',SKIN='#f5c4a0';
+let frame=0,isWalking=false,isLooking=false,lookDir=1,scrollTimeout=null,currentSection='';
+const sectionLabels={hero:'..',about:'..',skills:'..',projects:'..',experience:'..',certs:'..',contact:'..'};
 
-const N = '#00f5c4';
-const N2 = '#7b5cf5';
-const SKIN = '#f5c4a0';
+function drawGuy(walking,looking,dir){
+  gCtx.clearRect(0,0,36,52);
+  const t=frame;
+  const legSwing=walking?Math.sin(t*0.4)*6:0;
+  const armSwing=walking?Math.sin(t*0.4)*5:0;
+  const bobY=walking?Math.abs(Math.sin(t*0.4))*1.5:0;
+  const cx=18;
 
-let frame = 0;
-let isWalking = false;
-let isLooking = false;
-let lookDir = 1;
-let scrollTimeout = null;
-let currentSection = '';
+  gCtx.save();gCtx.globalAlpha=0.25;gCtx.fillStyle=N;
+  gCtx.beginPath();gCtx.ellipse(cx,51,7,2,0,0,Math.PI*2);gCtx.fill();gCtx.restore();
 
-const sectionLabels = { 'hero':' ','about':' ','skills':' ','projects':' ','experience':' ','certs':' ','contact':' ' };
-
-function drawGuy(walking, looking, dir) {
-  gCtx.clearRect(0, 0, 36, 52);
-  const t = frame;
-  const legSwing = walking ? Math.sin(t * 0.4) * 6 : 0;
-  const armSwing = walking ? Math.sin(t * 0.4) * 5 : 0;
-  const bobY = walking ? Math.abs(Math.sin(t * 0.4)) * 1.5 : 0;
-  const cx = 18;
-
-  gCtx.save();
-  gCtx.globalAlpha = 0.25;
-  gCtx.fillStyle = N;
-  gCtx.beginPath();
-  gCtx.ellipse(cx, 51, 7, 2, 0, 0, Math.PI*2);
-  gCtx.fill();
+  gCtx.save();gCtx.strokeStyle=N2;gCtx.lineWidth=3.5;gCtx.lineCap='round';
+  gCtx.beginPath();gCtx.moveTo(cx-3,35-bobY);gCtx.lineTo(cx-3+(walking?-legSwing*0.4:0),46-bobY+(walking?Math.abs(legSwing)*0.2:0));gCtx.stroke();
+  gCtx.beginPath();gCtx.moveTo(cx+3,35-bobY);gCtx.lineTo(cx+3+(walking?legSwing*0.4:0),46-bobY+(walking?Math.abs(legSwing)*0.2:0));gCtx.stroke();
+  gCtx.strokeStyle=N;gCtx.lineWidth=2.5;
+  gCtx.beginPath();gCtx.moveTo(cx-3+(walking?-legSwing*0.4:0),46-bobY+(walking?Math.abs(legSwing)*0.2:0));gCtx.lineTo(cx-7+(walking?-legSwing*0.4:0),46-bobY+(walking?Math.abs(legSwing)*0.2:0));gCtx.stroke();
+  gCtx.beginPath();gCtx.moveTo(cx+3+(walking?legSwing*0.4:0),46-bobY+(walking?Math.abs(legSwing)*0.2:0));gCtx.lineTo(cx+7+(walking?legSwing*0.4:0),46-bobY+(walking?Math.abs(legSwing)*0.2:0));gCtx.stroke();
   gCtx.restore();
 
-  gCtx.save();
-  gCtx.strokeStyle = N2;
-  gCtx.lineWidth = 3.5;
-  gCtx.lineCap = 'round';
-  gCtx.beginPath();
-  gCtx.moveTo(cx-3, 35-bobY);
-  gCtx.lineTo(cx-3 + (walking ? -legSwing*0.4 : 0), 46-bobY + (walking ? Math.abs(legSwing)*0.2 : 0));
+  gCtx.save();gCtx.fillStyle=N2;
+  gCtx.beginPath();gCtx.roundRect(cx-6,22-bobY,12,14,2);gCtx.fill();
+  gCtx.strokeStyle=N;gCtx.lineWidth=0.8;gCtx.globalAlpha=0.5;
+  gCtx.beginPath();gCtx.moveTo(cx,22-bobY);gCtx.lineTo(cx,35-bobY);gCtx.stroke();
+  gCtx.restore();
+
+  gCtx.save();gCtx.strokeStyle=SKIN;gCtx.lineWidth=3;gCtx.lineCap='round';
+  gCtx.beginPath();gCtx.moveTo(cx-6,24-bobY);
+  if(looking)gCtx.lineTo(cx-6+dir*8,26-bobY);
+  else gCtx.lineTo(cx-10,30-bobY+(walking?armSwing*0.3:0));
   gCtx.stroke();
-  gCtx.beginPath();
-  gCtx.moveTo(cx+3, 35-bobY);
-  gCtx.lineTo(cx+3 + (walking ? legSwing*0.4 : 0), 46-bobY + (walking ? Math.abs(legSwing)*0.2 : 0));
-  gCtx.stroke();
-  gCtx.strokeStyle = N;
-  gCtx.lineWidth = 2.5;
-  gCtx.beginPath();
-  gCtx.moveTo(cx-3+(walking?-legSwing*0.4:0), 46-bobY+(walking?Math.abs(legSwing)*0.2:0));
-  gCtx.lineTo(cx-7+(walking?-legSwing*0.4:0), 46-bobY+(walking?Math.abs(legSwing)*0.2:0));
-  gCtx.stroke();
-  gCtx.beginPath();
-  gCtx.moveTo(cx+3+(walking?legSwing*0.4:0), 46-bobY+(walking?Math.abs(legSwing)*0.2:0));
-  gCtx.lineTo(cx+7+(walking?legSwing*0.4:0), 46-bobY+(walking?Math.abs(legSwing)*0.2:0));
+  gCtx.beginPath();gCtx.moveTo(cx+6,24-bobY);
+  if(looking)gCtx.lineTo(cx+6+dir*2,26-bobY);
+  else gCtx.lineTo(cx+10,30-bobY+(walking?-armSwing*0.3:0));
   gCtx.stroke();
   gCtx.restore();
 
-  gCtx.save();
-  gCtx.fillStyle = N2;
-  gCtx.beginPath();
-  gCtx.roundRect(cx-6, 22-bobY, 12, 14, 2);
-  gCtx.fill();
-  gCtx.strokeStyle = N;
-  gCtx.lineWidth = 0.8;
-  gCtx.globalAlpha = 0.5;
-  gCtx.beginPath();
-  gCtx.moveTo(cx, 22-bobY);
-  gCtx.lineTo(cx, 35-bobY);
-  gCtx.stroke();
-  gCtx.restore();
+  gCtx.fillStyle=SKIN;gCtx.fillRect(cx-2,17-bobY,4,5);
 
   gCtx.save();
-  gCtx.strokeStyle = SKIN;
-  gCtx.lineWidth = 3;
-  gCtx.lineCap = 'round';
-  gCtx.beginPath();
-  gCtx.moveTo(cx-6, 24-bobY);
-  if(looking) gCtx.lineTo(cx-6 + dir*8, 26-bobY);
-  else gCtx.lineTo(cx-10, 30-bobY+(walking?armSwing*0.3:0));
-  gCtx.stroke();
-  gCtx.beginPath();
-  gCtx.moveTo(cx+6, 24-bobY);
-  if(looking) gCtx.lineTo(cx+6 + dir*2, 26-bobY);
-  else gCtx.lineTo(cx+10, 30-bobY+(walking?-armSwing*0.3:0));
-  gCtx.stroke();
-  gCtx.restore();
-
-  gCtx.fillStyle = SKIN;
-  gCtx.fillRect(cx-2, 17-bobY, 4, 5);
-
-  gCtx.save();
-  const headTilt = looking ? dir * 0.15 : 0;
-  gCtx.translate(cx, 13-bobY);
-  gCtx.rotate(headTilt);
-  gCtx.fillStyle = SKIN;
-  gCtx.beginPath();
-  gCtx.ellipse(0, 0, 7, 8, 0, 0, Math.PI*2);
-  gCtx.fill();
-  gCtx.fillStyle = '#2a1a0a';
-  gCtx.beginPath();
-  gCtx.ellipse(0, -5, 7, 4, 0, Math.PI, 0);
-  gCtx.fill();
-  
-  if(looking) {
-    gCtx.fillStyle = '#1a1a2e';
-    gCtx.beginPath();
-    gCtx.ellipse(dir*2.5, 0, 2.5, 2, 0, 0, Math.PI*2);
-    gCtx.fill();
-    gCtx.fillStyle = N;
-    gCtx.beginPath();
-    gCtx.arc(dir*3, 0, 0.8, 0, Math.PI*2);
-    gCtx.fill();
+  const headTilt=looking?dir*0.15:0;
+  gCtx.translate(cx,13-bobY);gCtx.rotate(headTilt);
+  gCtx.fillStyle=SKIN;gCtx.beginPath();gCtx.ellipse(0,0,7,8,0,0,Math.PI*2);gCtx.fill();
+  gCtx.fillStyle='#2a1a0a';gCtx.beginPath();gCtx.ellipse(0,-5,7,4,0,Math.PI,0);gCtx.fill();
+  if(looking){
+    gCtx.fillStyle='#1a1a2e';gCtx.beginPath();gCtx.ellipse(dir*2.5,0,2.5,2,0,0,Math.PI*2);gCtx.fill();
+    gCtx.fillStyle=N;gCtx.beginPath();gCtx.arc(dir*3,0,0.8,0,Math.PI*2);gCtx.fill();
   } else {
-    gCtx.fillStyle = '#1a1a2e';
-    gCtx.beginPath();
-    gCtx.ellipse(-2.5, 0, 2, 2, 0, 0, Math.PI*2);
-    gCtx.fill();
-    gCtx.beginPath();
-    gCtx.ellipse(2.5, 0, 2, 2, 0, 0, Math.PI*2);
-    gCtx.fill();
-    gCtx.fillStyle = N;
-    gCtx.beginPath();
-    gCtx.arc(-2.5, 0, 0.8, 0, Math.PI*2);
-    gCtx.fill();
-    gCtx.beginPath();
-    gCtx.arc(2.5, 0, 0.8, 0, Math.PI*2);
-    gCtx.fill();
+    gCtx.fillStyle='#1a1a2e';
+    gCtx.beginPath();gCtx.ellipse(-2.5,0,2,2,0,0,Math.PI*2);gCtx.fill();
+    gCtx.beginPath();gCtx.ellipse(2.5,0,2,2,0,0,Math.PI*2);gCtx.fill();
+    gCtx.fillStyle=N;
+    gCtx.beginPath();gCtx.arc(-2.5,0,0.8,0,Math.PI*2);gCtx.fill();
+    gCtx.beginPath();gCtx.arc(2.5,0,0.8,0,Math.PI*2);gCtx.fill();
   }
-  gCtx.strokeStyle = '#c0603a';
-  gCtx.lineWidth = 1;
-  gCtx.beginPath();
-  gCtx.arc(0, 3, 3, 0.2, Math.PI-0.2);
-  gCtx.stroke();
+  gCtx.strokeStyle='#c0603a';gCtx.lineWidth=1;
+  gCtx.beginPath();gCtx.arc(0,3,3,0.2,Math.PI-0.2);gCtx.stroke();
   gCtx.restore();
 
-  gCtx.save();
-  gCtx.globalAlpha = 0.12;
-  gCtx.strokeStyle = N;
-  gCtx.lineWidth = 8;
-  gCtx.beginPath();
-  gCtx.ellipse(cx, 22-bobY, 10, 18, 0, 0, Math.PI*2);
-  gCtx.stroke();
+  gCtx.save();gCtx.globalAlpha=0.12;gCtx.strokeStyle=N;gCtx.lineWidth=8;
+  gCtx.beginPath();gCtx.ellipse(cx,22-bobY,10,18,0,0,Math.PI*2);gCtx.stroke();
   gCtx.restore();
 }
 
-function getCurrentSection() {
-  const sections = ['contact','certs','experience','projects','skills','about','hero'];
-  for(const id of sections) {
-    const el = document.getElementById(id);
-    if(el) {
-      const rect = el.getBoundingClientRect();
-      if(rect.top <= window.innerHeight*0.5) return id;
-    }
+function getCurrentSection(){
+  const sections=['contact','certs','experience','projects','skills','about','hero'];
+  for(const id of sections){
+    const el=document.getElementById(id);
+    if(el){const rect=el.getBoundingClientRect();if(rect.top<=window.innerHeight*0.5)return id;}
   }
   return 'hero';
 }
 
-function updateGuyPosition() {
-  const scrolled = window.scrollY;
-  const maxScroll = document.body.scrollHeight - window.innerHeight;
-  const progress = Math.min(scrolled / maxScroll, 1);
-  const minTop = 60;
-  const maxTop = window.innerHeight - 70;
-  const targetTop = minTop + progress * (maxTop - minTop);
-  guyCanvas.style.top = targetTop + 'px';
-  guyLabel.style.top = (targetTop + 10) + 'px';
+function updateGuyPosition(){
+  const scrolled=window.scrollY;
+  const maxScroll=document.body.scrollHeight-window.innerHeight;
+  const progress=Math.min(scrolled/maxScroll,1);
+  const minTop=60,maxTop=window.innerHeight-70;
+  const targetTop=minTop+progress*(maxTop-minTop);
+  guyCanvas.style.top=targetTop+'px';
+  guyLabel.style.top=(targetTop+10)+'px';
 }
 
-let lastScroll = window.scrollY;
-(function animGuy() {
+let lastScroll=window.scrollY;
+(function animGuy(){
   frame++;
-  const curScroll = window.scrollY;
-  const scrolling = Math.abs(curScroll - lastScroll) > 0.5;
-  lastScroll = curScroll;
+  const curScroll=window.scrollY;
+  const scrolling=Math.abs(curScroll-lastScroll)>0.5;
+  lastScroll=curScroll;
 
-  if(scrolling) {
-    isWalking = true;
-    isLooking = false;
+  if(scrolling){
+    isWalking=true;isLooking=false;
     clearTimeout(scrollTimeout);
-    scrollTimeout = setTimeout(() => {
-      isWalking = false;
-      isLooking = true;
-      const sec = getCurrentSection();
-      currentSection = sec;
-      const label = sectionLabels[sec] || ' ';
-      guyLabel.textContent = label;
-      guyLabel.style.opacity = '1';
-      setTimeout(() => { guyLabel.style.opacity = '0'; }, 2000);
-    }, 150);
+    scrollTimeout=setTimeout(()=>{
+      isWalking=false;isLooking=true;
+      const sec=getCurrentSection();
+      currentSection=sec;
+      const label=sectionLabels[sec]||'// exploring';
+      guyLabel.textContent=label;
+      guyLabel.style.opacity='1';
+      setTimeout(()=>{guyLabel.style.opacity='0';},2000);
+    },150);
   }
 
-  drawGuy(isWalking, isLooking, -1);
+  drawGuy(isWalking,isLooking,-1);
   requestAnimationFrame(animGuy);
 })();
 
-window.addEventListener('scroll', updateGuyPosition, { passive: true });
+window.addEventListener('scroll',updateGuyPosition,{passive:true});
 updateGuyPosition();
 </script>
 </body>
